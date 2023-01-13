@@ -335,9 +335,13 @@ for (d in outputs) {
   names(Totculled)=c("simul","Year","ReefID","cvisits")##cumulative visits
   
   ##Count culled per year
-  totyear=Totculled%>%group_by(simul,Year)%>%count(ReefID)%>%data.frame()
-  totyear%<>%group_by(simul,Year)%>%summarise(tot=sum(n))%>%data.frame()
-  totyear$strat=d
+  Totculled%<>%arrange(simul,ReefID)
+  Totculled%<>%group_by(ReefID,simul)%>%mutate(lagvisit=lag(cvisits))
+  Totculled%<>%group_by(ReefID,simul)%>%mutate(visited=cvisits-lagvisit)##visit per year
+  Totculled%<>%mutate(visited= ifelse(is.na(visited), 1, visited))
+
+   totyear=Totculled%>%group_by(simul,Year)%>%summarise(tot=sum(visited))%>%data.frame()
+   totyear$strat=d
   
   Totculled%<>%left_join(reefarea)
   Totculled%<>%group_by(simul,Year)%>%
@@ -354,7 +358,6 @@ for (d in outputs) {
 
 TotalCulled=edit_labels(TotalCulled)##Total reef area culled
 yearculled=edit_labels(yearculled)##Total culled reefs per year
-
 
   
 ###############################################
