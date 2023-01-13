@@ -343,9 +343,9 @@ for (d in outputs) {
    totyear=Totculled%>%group_by(simul,Year)%>%summarise(tot=sum(visited))%>%data.frame()
    totyear$strat=d
   
-  Totculled%<>%left_join(reefarea)
-  Totculled%<>%group_by(simul,Year)%>%
-    summarise(visitedArea=sum(CHarea))%>%as.data.frame()
+   Totculled%<>%filter(visited==1)%>%left_join(reefarea)
+   Totculled%<>%group_by(simul,Year)%>%
+   summarise(visitedArea=sum(CHarea))%>%as.data.frame()
   
   Totculled$strat=d
   
